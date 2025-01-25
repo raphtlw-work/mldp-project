@@ -8,12 +8,12 @@ import streamlit as st
 model = joblib.load("DayOfWeek_LinearRegression.pkl")
 
 
+@st.cache_resource
 def load_data():
-    # Download dataset
     import kagglehub
 
     dataset_path = kagglehub.dataset_download(
-        "borismarjanovic/price-volume-data-for-all-us-stocks-etfs"
+        "borismarjanovic/price-volume-data-for-all-us-stocks-etfs",
     )
 
     print("Path to dataset files:", dataset_path)
