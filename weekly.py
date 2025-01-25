@@ -1,5 +1,3 @@
-import os
-
 import joblib
 import pandas as pd
 import streamlit as st
@@ -8,110 +6,11 @@ import streamlit as st
 model = joblib.load("DayOfWeek_LinearRegression.pkl")
 
 
-@st.cache_resource
 def load_data():
-    import kagglehub
-
-    dataset_path = kagglehub.dataset_download(
-        "borismarjanovic/price-volume-data-for-all-us-stocks-etfs",
-    )
-
-    print("Path to dataset files:", dataset_path)
-
-    dataset_path += "/Stocks"
-
-    # List to store individual DataFrames
-    dataframes = []
-
-    # Iterate through all files in the directory
-    for file_name in os.listdir(dataset_path):
-        # Only process .txt files
-        if file_name.endswith(".txt"):
-            file_path = os.path.join(dataset_path, file_name)
-
-            if len(open(file_path).read()) == 0:
-                continue
-
-            # Read the file into a DataFrame, assuming the first line is the header
-            df = pd.read_csv(file_path)
-
-            # Add a 'Stock' column to store the stock symbol (derived from file name)
-            df["Stock"] = file_name.split(".")[0]
-
-            # Drop the 'OpenInt' column since it's not necessary for the analysis
-            df = df.drop(columns=["OpenInt"])
-
-            # Append to the list of DataFrames
-            dataframes.append(df)
-
-    # Combine all DataFrames into one
-    combined_df = pd.concat(dataframes, ignore_index=True)
-
-    # Display a summary of the combined DataFrame
-    print(f"Combined DataFrame shape: {combined_df.shape}")
-    print(combined_df.head())
-
-    # Check for missing values
-    print(combined_df.isnull().sum())
-
-    # Check for duplicates
-    duplicates = combined_df.duplicated().sum()
-    print(f"Number of duplicate rows: {duplicates}")
-
-    # If duplicates exist, drop them
-    combined_df = combined_df.drop_duplicates()
+    combined_df = pd.read_csv("combined_df.csv")
 
     # Convert 'Date' column to datetime
     combined_df["Date"] = pd.to_datetime(combined_df["Date"])
-
-    print(combined_df.dtypes)
-
-    # Add derived features
-    combined_df["Year"] = combined_df["Date"].dt.year
-    combined_df["Month"] = combined_df["Date"].dt.month
-    combined_df["DayOfWeek"] = combined_df["Date"].dt.day_name()
-    combined_df["DailyReturn"] = (
-        combined_df.groupby("Stock")["Close"].pct_change() * 100
-    )
-
-    election_years = [
-        1962,
-        1964,
-        1966,
-        1968,
-        1970,
-        1972,
-        1974,
-        1976,
-        1978,
-        1980,
-        1982,
-        1984,
-        1986,
-        1988,
-        1990,
-        1992,
-        1994,
-        1996,
-        1998,
-        2000,
-        2002,
-        2004,
-        2006,
-        2008,
-        2010,
-        2012,
-        2014,
-        2016,
-        2018,
-        2020,
-        2022,
-        2024,
-    ]
-
-    combined_df["IsElectionYear"] = combined_df["Year"].apply(
-        lambda x: 1 if x in election_years else 0
-    )
 
     # Add day of the week
     combined_df["DayOfWeek"] = combined_df["Date"].dt.dayofweek  # Monday=0, Sunday=6
@@ -121,7 +20,6 @@ def load_data():
 
 data = load_data()
 
-# App layout
 st.title("Stock Analysis: Best Days and Years to Trade")
 st.sidebar.header("Analysis Options")
 
