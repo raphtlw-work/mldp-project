@@ -161,10 +161,15 @@ if st.sidebar.checkbox("Best Year for Stock Returns"):
 # Stock ticker performance
 if st.sidebar.checkbox("Best Stock Ticker Analysis"):
     st.subheader("Best Stock Ticker Analysis")
-    year = st.selectbox("Select Year", sorted(filtered_data["Year"].unique()))
+    year = st.selectbox(
+        "Select Year",
+        sorted(filtered_data["Year"].unique()),
+        key="stock_ticker_select_year",
+    )
     day = st.selectbox(
         "Select Day of the Week",
         ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        key="stock_ticker_select_day",
     )
 
     day_to_num = {"Monday": 0, "Tuesday": 1, "Wednesday": 2, "Thursday": 3, "Friday": 4}
@@ -197,6 +202,7 @@ if st.sidebar.checkbox("Predict Returns for Day of the Week"):
     day = st.selectbox(
         "Select Day of the Week",
         ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        key="predict_returns_select_day",
     )
     day_encoded = [
         (
