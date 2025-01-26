@@ -5,3 +5,4 @@ seaborn
 joblib
 kagglehub
 streamlit
+yfinance
